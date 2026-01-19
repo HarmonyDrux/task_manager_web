@@ -1,7 +1,11 @@
 import functions
 import FreeSimpleGUI as sg
 import emoji
+import time
 
+sg.theme('DarkTeal4')
+
+clock = sg.Text('', key='clock')
 label = sg.Text(f"Type an TO-DO {emoji.emojize(':thinking_face:')}")
 input_box = sg.InputText(tooltip='Enter todo', key="todo")
 add_button = sg.Button('Add')
@@ -11,16 +15,18 @@ edit_button = sg.Button('Edit')
 complete_button = sg.Button('Complete')
 exit_button = sg.Button('Exit')
 window = sg.Window(f'TO-DO {emoji.emojize(':memo:')} App',
-                   layout=[[label],
+                   layout=[[clock],
+                           [label],
                            [input_box, add_button],
                            [list_box, edit_button, complete_button],
                            [exit_button]],
                    font=("Helvetica", 20))
 
 while True:
-    event, values = window.read() #Mostra tudo o que foi executado pelo usuário no gui.
+    event, values = window.read(timeout=200) #Mostra tudo o que foi executado pelo usuário no gui.
     # Ex: event: Add pois o usuário clicou em add,
     # values = {'todo': 'clean bathroom'} pois o usuario digitou clean bathroom
+    window['clock'].update(value=time.strftime("%b %d, %Y  %H:%M:%S"))
     match event:
         case "Add":
             todos = functions.read_todos()
@@ -29,21 +35,27 @@ while True:
             functions.write_todos(todos)
             window['todos'].update(values=todos)
         case "Edit":
-            todo_to_edit = values['todos'][0]
-            new_todo = values['todo']
+            try:
+                todo_to_edit = values['todos'][0]
+                new_todo = values['todo']
 
-            todos = functions.read_todos()
-            index = todos.index(todo_to_edit)
-            todos[index] = new_todo.capitalize()
-            functions.write_todos(todos)
-            window['todos'].update(values=todos)
+                todos = functions.read_todos()
+                index = todos.index(todo_to_edit)
+                todos[index] = new_todo.capitalize()
+                functions.write_todos(todos)
+                window['todos'].update(values=todos)
+            except IndexError:
+                sg.Popup("Please select an item to edit.", font=("Helvetica", 20))
         case "Complete":
-            todos_completed = values['todos'][0]
-            todos = functions.read_todos()
-            todos.remove(todos_completed)
-            functions.write_todos(todos)
-            window['todos'].update(values=todos)
-            window['todo'].update(value="")
+            try:
+                todos_completed = values['todos'][0]
+                todos = functions.read_todos()
+                todos.remove(todos_completed)
+                functions.write_todos(todos)
+                window['todos'].update(values=todos)
+                window['todo'].update(value="")
+            except IndexError:
+                sg.Popup("Please select the completed task.", font=("Helvetica", 20))
         case "Exit":
             break
         case "todos":
