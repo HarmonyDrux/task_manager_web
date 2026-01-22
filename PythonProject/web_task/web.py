@@ -24,3 +24,5 @@ for index, todo in enumerate(todos):
         st.rerun()
 
 st.text_input(label="",placeholder="Enter a todo: ", on_change=add_todo,key='new_todo')
+
+#aplicação
