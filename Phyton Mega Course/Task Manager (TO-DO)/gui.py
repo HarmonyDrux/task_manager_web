@@ -2,6 +2,13 @@ import functions
 import FreeSimpleGUI as sg
 import emoji
 import time
+import os
+
+if not os.path.exists("todos.txt"):  #caso o arquivo todos.txt nao exista no computador, ele vai criar automaticamente.
+                                      # Caso exista, ele não irá criar outro ou escrever em cima do existente
+    with open("todos.txt", "w") as file:
+        pass
+
 
 sg.theme('DarkTeal4')
 
